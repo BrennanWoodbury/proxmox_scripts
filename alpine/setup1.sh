@@ -1,7 +1,7 @@
 #!/bin/ash
 
 apk update
-apk add git python3 net-tools sudo vim wget curl htop ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux sudo
+apk add git python3 net-tools sudo vim wget curl htop ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux
 
 adduser local_admin -D -g ""
 addgroup sudo
