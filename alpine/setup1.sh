@@ -1,14 +1,19 @@
 #!/bin/ash
 
-[ if $# -lt 2 ]; then
-  echo "Command usage: $0 hostname ip"
+[ if $# -lt 1 ]; then
+  echo "Command usage: $0 hostname"
+  exit(1)
+fi
+
+[ if $# -gt 1 ]; then
+  echo "Command usage: $0 hostname"
   exit(1)
 fi
 
 hostname=$1
-ip_address=$2
 
-apk add git python3 net-tools sudo vim wget curl htop openssh ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux sudo
+apk update
+apk add git python3 net-tools sudo vim wget curl htop ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux sudo
 
 adduser -D -g "" local_admin
 echo "local_admin:wtpotusiotfampu" | chpasswd
@@ -41,15 +46,3 @@ echo "Updated ~/.ssh/id_rsa"
 chown -R local_admin:local_admin /home/local_admin/.ssh
 chmod 600 /home/local_admin/.ssh/authorized_keys
 
-echo <<EOF >> /etc/network/interfaces 
-auto lo
-iface lo inet loopback
-
-auto eth0
-iface eth0 inet static
-  address $ip_address
-  netmask 255.255.255.0
-  gateway 192.168.0.1
-EOF
-
-echo "Updated eth0 to use IP $ip_address"
