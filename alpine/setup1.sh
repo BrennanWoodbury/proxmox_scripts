@@ -1,77 +1,55 @@
 #!/bin/ash
 
-apk add bash util-linux sudo
-bash
+[ if $# -lt 2 ]; then
+  echo "Command usage: $0 hostname ip"
+  exit(1)
+fi
 
-apk add git python3 net-tools sudo vim wget curl htop openssh ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip 
+hostname=$1
+ip_address=$2
 
-adduser --disabled-passwd --gecos "" local_admin
+apk add git python3 net-tools sudo vim wget curl htop openssh ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux sudo
+
+adduser -D -g "" local_admin
 echo "local_admin:wtpotusiotfampu" | chpasswd
 addgroup sudo
 adduser local_admin sudo
 adduser local_admin wheel
+echo "Added user \"local_admin\", created group \"sudo\" and added local_admin to both the \"sudo\" and \"wheel\" groups."
 
 cp /etc/sudoers /etc/sudoers.bak
 echo "%sudo ALL=(ALL:ALL) ALL" | EDITOR='tee -a' visudo
 
 cp /etc/passwd /etc/passwd.bak
 sed -i "s|^\(local_admin:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:\)[^:]*|\1/bin/bash|" /etc/passwd
-
+echo "set default shell to bash"
 
 mkdir /home/local_admin/.ssh
-cat <<EOT >> /home/local_admin/.ssh/id_rsa 
------BEGIN OPENSSH PRIVATE KEY-----
-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
------END OPENSSH PRIVATE KEY-----
-EOT
+chmod 700 /home/local_admin/.ssh
 
-echo 4096 SHA256:su6Jy7rVkOJst96DXMtxehwd3TXird0h53t8R+gWvLc local_admin@bwoody.net (RSA) >> /home/local_admin/.ssh/id_rsa.pub
+ssh-keygen -b  4096 -C $hostname@bwoody.local -f /home/local_admin/.ssh/id_rsa -N ""
+echo "Created new ssh keypair @ /home/local_admin/.ssh/id_rsa*"
 
-echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCd/zddBAhdJgoI6KbdKirO1jOQJa6ok5eC8OO+poVlVsjObNMWF6ptt04EiSZeeKQFnyz85UTPGwcoafcvM9+yfG1AcLFbfgaSHEkcgzAtT5dcnnb0FsH16cj4uh9UhsGcUTAJP1UWs+jASOlgMl9Uj7+Mpf8f1jJfdjhS/ZDyOn1jJV3CB7dxPIAjq1DRF8XaxTHI4M3zTQ0EpAR4qsGBJ4mwRRxkDtQbTXN33jbsoccJahX0KgbwK2MjAeYu+W/JeK+IT8hl7JsXSEEospuLE7H6RvvOwiuvT9izYHBx6gmpJZUMHaJnHjjutDy+hh3fQNDwM0WXV19EJ6KAnC5BYnIsjmVmao8Cb1XeTJDjxy2aXg57jfI9/wcoPsShwRs5KqaiDtwo7fzo+5CuQmYINcTu9PWa8OwCkne6IXCb8XUrgzPGcZ5pf/H1dIKqnMmxa8MwEyyT3DkNNiBSNS303tml2XkE5BFRyGtCLgYsXO1Yy+Y3vGVr8aHodd0Bo+8= bthedub@brennan_wsl >> /home/local_admin/.ssh/authorized_keys
-echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDC4vf1lmQKXftCL6Q3zDJxo6M+TO6eelPJNmSePS3GT1qPm5j8jDbWInTRIAQwS8G32loOUfSA/6ikw+zYl6jFvGElM2j6KpLcBRWuL8l+moIeVcKuSpNxVXbjOm1fI9Xy9KcQiGlB0C2EAw74wa4EtusMJZA38UcvOQNa4iHnxODDDzkyigmBi6ri45CHiqyKtsU8DGK5qtGJBXsI07AVAGrhFK8ysOk3FyzlZDW6aqtRKkkWokUb7705RijCcft6IyQ7MCjz20ODobGjee6EsV+JbnKC4wqT/1LRB0/0yIYDOHgvZbRrG+RL1HPwwr663ggxEbpvjKdh91t3nJZ2haJB3bVLRC2I9rvOXeOhKdYoUkVznPXby6gnhxGuidJ6imZc6SL0Ym9Cd/oYEnT5RxrjB2Bb2HlO4jE+xypOjfgpDvZ05gGZMkKGheePcSFIkq4IErrqzJHMCu3Htu9Hkajc7HjYYpSTntrMFzUIAf3ODdpV1CII+hkKSPFSqfM= brenn@Brennans-Desktop >> /home/local_admin/.ssh/authorized_keys
+cat <<EOF >> /home/local_admin/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCd/zddBAhdJgoI6KbdKirO1jOQJa6ok5eC8OO+poVlVsjObNMWF6ptt04EiSZeeKQFnyz85UTPGwcoafcvM9+yfG1AcLFbfgaSHEkcgzAtT5dcnnb0FsH16cj4uh9UhsGcUTAJP1UWs+jASOlgMl9Uj7+Mpf8f1jJfdjhS/ZDyOn1jJV3CB7dxPIAjq1DRF8XaxTHI4M3zTQ0EpAR4qsGBJ4mwRRxkDtQbTXN33jbsoccJahX0KgbwK2MjAeYu+W/JeK+IT8hl7JsXSEEospuLE7H6RvvOwiuvT9izYHBx6gmpJZUMHaJnHjjutDy+hh3fQNDwM0WXV19EJ6KAnC5BYnIsjmVmao8Cb1XeTJDjxy2aXg57jfI9/wcoPsShwRs5KqaiDtwo7fzo+5CuQmYINcTu9PWa8OwCkne6IXCb8XUrgzPGcZ5pf/H1dIKqnMmxa8MwEyyT3DkNNiBSNS303tml2XkE5BFRyGtCLgYsXO1Yy+Y3vGVr8aHodd0Bo+8= bthedub@brennan_wsl
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDC4vf1lmQKXftCL6Q3zDJxo6M+TO6eelPJNmSePS3GT1qPm5j8jDbWInTRIAQwS8G32loOUfSA/6ikw+zYl6jFvGElM2j6KpLcBRWuL8l+moIeVcKuSpNxVXbjOm1fI9Xy9KcQiGlB0C2EAw74wa4EtusMJZA38UcvOQNa4iHnxODDDzkyigmBi6ri45CHiqyKtsU8DGK5qtGJBXsI07AVAGrhFK8ysOk3FyzlZDW6aqtRKkkWokUb7705RijCcft6IyQ7MCjz20ODobGjee6EsV+JbnKC4wqT/1LRB0/0yIYDOHgvZbRrG+RL1HPwwr663ggxEbpvjKdh91t3nJZ2haJB3bVLRC2I9rvOXeOhKdYoUkVznPXby6gnhxGuidJ6imZc6SL0Ym9Cd/oYEnT5RxrjB2Bb2HlO4jE+xypOjfgpDvZ05gGZMkKGheePcSFIkq4IErrqzJHMCu3Htu9Hkajc7HjYYpSTntrMFzUIAf3ODdpV1CII+hkKSPFSqfM= brenn@Brennans-Desktop
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0njhxy10VU0MN5Tre1tfXYXmHFEkl1itAR0nRnHON9DzX3sx6D9OGv5zJUuHyuEuHY1KkGlG/vbfRkoDLcqoZ3t30d5n4m0/E1BFLgRkweIBYCPQzDm1bDnFZDAM0NHLtD9UWVaAMLY7QOh/kk3ygMidQO1dIKyPYn4WH6EDRMjgB0Vdo5TGxNVW5g97XIwIrbO3VpbxenHsNr1bQ5Jm+rDYe+vnS9FFRdp72rI0tqGs4A06Jiq4+z+ajel00QwO5kvqyqBQocdRjcM3vP7R02LIsmJFTGhVCdcxybLRFsdkEJ1eARB8OYluVjgnUzeZc9jy7aUpaA/AYvvG4SUIa2OKzDcJabsiAYdWxaahwkHdk+4sSUby2Q4KDzs2xpx4vXr7JtcA49W8XQvo6RA4s/l8JMnopoVsKwUFyhgGWaqwn2At2hMnwWyylci69uRSVC89PZ/NxVjSCB1iEOvZoNYoTIgsWbwGGr7Jk/hgHD1cjGnmXVeuAHlA/foeifEGal4gNxqRLH600JMPXJ/QKm7XnyqEDZcLuSaZDoq7Qug/0Dq85gqe0G555fry20avaN9LPzhnt1G6CULUtJBeRnlvUcHOioTf/0VpUvjrk1H7VknzXcFP2fyozr0CvDKGK1okvgkuPJy0QdmNlwcB/qmLGHgbXASieK33iCybLlw== ansible@bwoody.local
+EOF
+
+echo "Updated ~/.ssh/id_rsa"
+
+chown -R local_admin:local_admin /home/local_admin/.ssh
+chmod 600 /home/local_admin/.ssh/authorized_keys
+
+echo <<EOF >> /etc/network/interfaces 
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address $ip_address
+  netmask 255.255.255.0
+  gateway 192.168.0.1
+EOF
+
+echo "Updated eth0 to use IP $ip_address"
