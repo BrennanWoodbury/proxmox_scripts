@@ -1,26 +1,7 @@
 #!/bin/ash
 
-[ if $# -lt 1 ]; do
-  echo "Command usage: $0 hostname"
-  exit(1)
-fi
-
-[ if $# -gt 1 ]; do
-  echo "Command usage: $0 hostname"
-  exit(1)
-fi
-
-hostname=$1
-
 apk update
 apk add git python3 net-tools sudo vim wget curl htop ca-certificates iproute2 bind-tools nmap tmux lsof build-base unzip zip tar gzip bash util-linux sudo
-
-adduser -D -g "" local_admin
-echo "local_admin:wtpotusiotfampu" | chpasswd
-addgroup sudo
-adduser local_admin sudo
-adduser local_admin wheel
-echo "Added user \"local_admin\", created group \"sudo\" and added local_admin to both the \"sudo\" and \"wheel\" groups."
 
 cp /etc/sudoers /etc/sudoers.bak
 echo "%sudo ALL=(ALL:ALL) ALL" | EDITOR='tee -a' visudo
