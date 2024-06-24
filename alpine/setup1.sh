@@ -1,11 +1,11 @@
 #!/bin/ash
 
-[ if $# -lt 1 ]; then
+[ if $# -lt 1 ]; do
   echo "Command usage: $0 hostname"
   exit(1)
 fi
 
-[ if $# -gt 1 ]; then
+[ if $# -gt 1 ]; do
   echo "Command usage: $0 hostname"
   exit(1)
 fi
