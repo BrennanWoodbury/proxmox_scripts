@@ -13,8 +13,10 @@ hostname=$1
 apt update
 apt upgrade -y
 
-adduser -m -G sudo username && echo "local_admin:Wtpotusiotfampu1776!" | chpasswd
+apt install vim sudo -y
 
+mkdir /home/local_admin/.ssh
+touch /home/local_admin/.ssh/authorized_keys
 
 ssh-keygen -b  4096 -C $hostname@bwoody.local -f /home/local_admin/.ssh/id_rsa -N ""
 echo "Created new ssh keypair @ /home/local_admin/.ssh/id_rsa*"
