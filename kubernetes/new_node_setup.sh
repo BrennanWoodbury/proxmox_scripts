@@ -34,4 +34,4 @@ echo "System will reboot in 10 seconds, press Ctrl+C to cancel"
 sleep 10
 reboot
 
-
+yes y | sh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
