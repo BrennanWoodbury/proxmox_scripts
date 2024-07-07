@@ -10,7 +10,7 @@ wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.14/cri-docke
 
 tar -xvf cri-dockerd-0.3.14.amd64.tgz
 
-mv cri-dockerd /usr/local/bin/
+mv cri-dockerd/cri-dockerd /usr/local/bin/
 
 cat <<EOF | sudo tee /etc/systemd/system/cri-docker.service
 [Unit]
@@ -52,5 +52,10 @@ systemctl enable cri-docker.socket
 systemctl start cri-docker.service
 systemctl start cri-docker.socket
 
+usermod -aG docker $USER
 
-systemctl status cri-docker.service
+echo "###### INSTALL FINISHED ######" 
+echo "check that cri-docker is working by running"
+echo " - sudo systemctl status cri-docker.service"
+echo " - sudo docker run hello-world"
+echo "Troubleshoot as necessary" 
