@@ -44,24 +44,19 @@ fi
 apt update && apt upgrade -y
 apt install vim sudo acl ca-certificates jq unzip curl libatomic1 -y
 
-# 3. Docker Installation
-sudo apt update
-sudo apt install ca-certificates curl -y
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
+# 3. Docker Installation (Ubuntu 24.04 Official Method)
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add the repository to Apt sources:
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
+# Add the repository to Apt sources using the standard Ubuntu .list format
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-sudo apt update
+apt update
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 # 4. Bitwarden Install + Automated Authentication & Password Fetch
 # Only run if PLAIN_PASS was not provided via --pw
@@ -80,7 +75,7 @@ if [ -z "$PLAIN_PASS" ]; then
     export PATH="/opt/fnm:$PATH"
     eval "$(fnm env --shell bash)"
 
-    # --- Skip Node 26 installation if it's already active ---
+    # --- Skip Node installation if it's already active ---
     if command -v node &> /dev/null && [ "$(node -v | cut -d'.' -f1)" == "v26" ]; then
         echo "Node.js v26 is already installed. Skipping."
     else
